@@ -1,0 +1,280 @@
+﻿@model EmpAppCoreEF_Self.Models.EmployeeModel
+
+@{
+    ViewData["Title"] = "Employee Details";
+}
+
+<h2>Employee Details</h2>
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <input type="hidden" value="0" id="hdnEmployeeId" />
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Employee Name </label>
+                    <input type="text" id="txtEmpName" class="form-control" />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Surname</label>
+                    <input type="text" id="txtEmpSurname" class="form-control" />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Qualification</label>
+                    <input type="text" id="txtQualification" class="form-control" />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Address</label>
+                    <input type="text" id="txtAddress" class="form-control" />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Contact Number</label>
+                    <input type="text" id="txtContact" onkeypress="return isNumber(event);" class="form-control" />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Select Department</label>
+                    @Html.DropDownList("ddlDeptId", Model.DepartmentList, "Select Department", new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group" style="margin-top:23px;">
+                    <input type="button" id="btnSaveEmpData" value="Save" class="btn btn-primary" />
+                    <input type="button" id="btnCancel" value="Cancel" class="btn btn-group" />
+                </div>
+            </div>
+            
+        </div>
+        <div class="panel panel-default" style="margin-top:15px;">
+            <div class="panel-body">
+                <div class="col-md-12">
+                    <table id="tblEmpData" class="table-responsive table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Employee Name</th>
+                                <th>Qualification</th>
+                                <th>Contact Number</th>
+                                <th>Department Name</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<environment include="Development">
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script>
+        $(document).ready(function () {
+            GetEmployeeDataLoad();
+            $('#tblEmpData').dataTable();
+            $('#tblEmpData_filter input').addClass('form-control');
+            $('#tblEmpData_length select').addClass('form-control');
+        });
+
+        function GetEmployeeDataLoad() {
+            if ($.fn.dataTable.isDataTable('#tblEmpData')) {
+                $('#tblEmpData').DataTable().draw();
+            }
+            Table = $('#tblEmpData').DataTable({
+                "processing": true,
+                "serverSide": false,
+                "paging": true,
+                "ordering": false,
+                "info": true,
+                "searching": true,
+                "bFilter": false,
+                "scrollX": "100%",
+                "scrollY": ($(window).height() - 400),
+                "sScrollXInner": "100%",
+                "bScrollCollapse": true,
+                "sAjaxSource": '@Url.Action("GetEmployeeDataLoad", "Employee")',
+                "bDestroy": true,
+                "bLengthChange": true,
+                "bPaginate": true,
+                "sEmptyTable": "Loading data from server",
+                "columns": [
+
+                    {
+                        "sWidth": "5%", "sClass": "TextCenter EmpName",
+                        "render": function (data, type, row) {
+                            return (row[1]);
+                        }
+                    },
+                    {
+                        "sWidth": "5%", "sClass": "TextCenter Qualification",
+                        "render": function (data, type, row) {
+                            return (row[2]);
+                        }
+                    },
+                    {
+                        "sWidth": "5%", "sClass": "TextCenter ContactNo",
+                        "render": function (data, type, row) {
+                            return (row[3]);
+                        }
+                    },
+                    {
+                        "sWidth": "5%", "sClass": "TextCenter DepartmentName",
+                        "render": function (data, type, row) {
+                            return (row[4]);
+                        }
+                    },
+                    {
+                        "bSortable": false,
+                        "sClass": "TextCenter",
+                        "sWidth": "3%",
+                        "render": function (data, type, row) {
+                            return '<center><a href="javascript:void(0);"  onclick=EditData("' + row[0] + '"); return false;> <i class="glyphicon glyphicon-edit"></i></a>' +
+                                ' <a href="javascript:void(0);"  onclick=deleteData("' + row[0] + '"); return false;> <i class="glyphicon glyphicon-trash"></i></a></center>';
+                        },
+                        "targets": 0,
+                    }
+                ],
+            });
+        }
+
+
+        $("#btnSaveEmpData").click(function () {
+            if (ValidateEmployees()) {
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("SaveEmpData", "Employee")',
+                    data: {
+                        EmpId: $("#hdnEmployeeId").val(),
+                        EmpName: $("#txtEmpName").val(),
+                        EmpSurname: $("#txtEmpSurname").val(),
+                        Qualification: $("#txtQualification").val(),
+                        Address: $("#txtAddress").val(),
+                        ContactNumber: $("#txtContact").val(),
+                        DeptId: $("#ddlDeptId").val(),
+                    },
+                    success: function (result) {
+                        if (result == "Saved") {
+                            $.alert("Data Saved Successfully", {
+                                title: false,
+                                closeTime: 3000,
+                            });
+                        }
+                        else {
+                            $.alert("Data Updated Successfully", {
+                                title: false,
+                                closeTime: 3000,
+                            });
+
+                            $('#btnSaveEmpData').val("Save");
+
+                        }
+                        GetEmployeeDataLoad();
+                        ClearData();
+                    }
+                });
+            }
+            else {
+                return false;
+            }
+         
+        });
+
+        $("#btnCancel").click(function () {
+            ClearData();
+        });
+
+        function EditData(GetEmpId) {
+                $.ajax({
+                    url: '@Url.Action("EditEmployeeDetails", "Employee")',
+                    type: 'POST',
+                    data: { "id": GetEmpId},
+                    success: function (result) {
+                        if (result != null) {
+                            $("#hdnEmployeeId").val(result.empId);
+                            $("#txtEmpName").val(result.empName);
+                            $("#txtEmpSurname").val(result.empSurname);
+                            $("#txtQualification").val(result.qualification);
+                            $("#txtAddress").val(result.address);
+                            $("#txtContact").val(result.contactNumber);
+                            $("#ddlDeptId").val(result.deptId);
+                        }
+                      }
+                });
+
+            $('#btnSaveEmpData').val("Update");
+        }
+
+          function deleteData(EmpId) {
+            if (confirm("Are you sure want to delete this Employee?")) {
+                $.ajax({
+                    url: '@Url.Action("DeleteEmployee", "Employee")',
+                    type: 'POST',
+                    data: { "id": EmpId},
+                    success: function (result) {
+                          if (result == "Deleted") {
+                              $.alert("Delete data successfully", {
+                                  title: false,
+                                  closeTime: 3000,
+                              });
+                          } else {
+                              $.alert("Data is not deleted successfully", {
+                                  title: false,
+                                  closeTime: 3000,
+                              });
+                          }
+                        GetEmployeeDataLoad();
+                        ClearData();
+                      }
+                });
+            }
+            return false;
+        }
+
+        function ClearData() {
+            $("#txtEmpName").val('');
+            $("#txtEmpSurname").val('');
+            $("#txtQualification").val('');
+            $("#txtAddress").val('');
+            $("#txtContact").val('');
+            $("#ddlDeptId").val('');
+            $("#hdnEmployeeId").val(0);
+            $('#btnSaveEmpData').val("Save");
+        }
+
+        function ValidateEmployees() {
+            var flag = true;
+            if (!ValidationRequired($("#txtEmpName"), "Employee Name required", 'after')) {
+                flag = false;
+            }
+            if (!ValidationRequired($("#txtEmpSurname"), "Surname is required", 'after')) {
+                flag = false;
+            }
+            if (!ValidationRequired($("#txtAddress"), "Address is required", 'after')) {
+                flag = false;
+            }
+            if (!ValidationRequired($("#txtQualification"), "Qualification is required", 'after')) {
+                flag = false;
+            }
+            if (!ValidationRequired($("#txtContact"), "ContactNo is  required", 'after')) {
+                flag = false;
+            }
+            if (!ValidationRequired($("#ddlDeptId"), "Please select department", 'after')) {
+                flag = false;
+            }
+
+            return flag;
+        }
+
+    </script>
+</environment>
