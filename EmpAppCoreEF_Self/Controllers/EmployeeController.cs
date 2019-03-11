@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using EmpAppCoreEF_Self.Data;
+﻿using EmpAppCoreEF_Self.Data;
 using EmpAppCoreEF_Self.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace EmpAppCoreEF_Self.Controllers
 {
@@ -19,145 +19,99 @@ namespace EmpAppCoreEF_Self.Controllers
             _context = Context;
         }
 
-        public IActionResult EmployeeIndex()
+        public async Task<IActionResult> EmployeeIndex()
         {
-            List<DepartmentModel> lstDeptData = _context.DepartmentModel.Where(x=>x.IsDelete == false).ToList();
-            SelectList lstDeptSelList = new SelectList(lstDeptData, "DeptId", "DeptName");
+            var employeeList = _context.EmployeeModel.Include(e => e.DepartmentModel);
+            return View(await employeeList.ToListAsync());
+        }
 
-            EmployeeModel objEmpModel = new EmployeeModel();
-            objEmpModel.DepartmentList = lstDeptSelList;
+        public async Task<IActionResult> Create(int? id)
+        {
+            EmployeeModel employee = new EmployeeModel();
+            List<SelectListItem> lstDeptData = (from d in _context.DepartmentModel
+                                                where (d.IsDelete == false)
+                                                select new SelectListItem
+                                                {
+                                                    Text = d.DeptName,
+                                                    Value = d.DeptId.ToString()
+                                                }).ToList();
 
-            return View(objEmpModel);
+            lstDeptData.Insert(0, new SelectListItem { Text = "Select Department", Value = "" });
+            ViewBag.DeptList = lstDeptData;
+
+            if (id != null)
+            {
+                employee = await _context.EmployeeModel.FindAsync(id);
+
+                if (employee == null)
+                {
+                    return NotFound();
+                }
+            }
+
+            return View(employee);
         }
 
         [HttpPost]
-        public async Task<JsonResult> SaveEmpData(EmployeeModel objViewEmp)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(EmployeeModel objEmpView)
         {
-            string result = string.Empty;
             try
             {
                 EmployeeModel objNewEmp = new EmployeeModel();
-                objNewEmp.EmpName = objViewEmp.EmpName;
-                objNewEmp.EmpSurname = objViewEmp.EmpSurname;
-                objNewEmp.Qualification = objViewEmp.Qualification;
-                objNewEmp.DeptId = objViewEmp.DeptId;
-                objNewEmp.ContactNumber = objViewEmp.ContactNumber;
-                objNewEmp.Address = objViewEmp.Address;
-
-                if (objViewEmp.EmpId == 0)
+                if (ModelState.IsValid)
                 {
-                    _context.Entry(objNewEmp).State = EntityState.Added;
-                    result = "Saved";
-                }
-                else {
-                    objNewEmp.EmpId = objViewEmp.EmpId;
-                    _context.Entry(objNewEmp).State = EntityState.Modified;
-                    result = "Updated";
-                }
+                    objNewEmp.EmpName = objEmpView.EmpName;
+                    objNewEmp.EmpSurname = objEmpView.EmpSurname;
+                    objNewEmp.Qualification = objEmpView.Qualification;
+                    objNewEmp.DeptId = objEmpView.DeptId;
+                    objNewEmp.ContactNumber = objEmpView.ContactNumber;
+                    objNewEmp.Address = objEmpView.Address;
 
-                await _context.SaveChangesAsync();
-                return Json(result);
+                    if (objEmpView.EmpId == 0)
+                    {
+                        _context.Entry(objNewEmp).State = EntityState.Added;
+                    }
+                    else
+                    {
+                        objNewEmp.EmpId = objEmpView.EmpId;
+                        _context.Entry(objNewEmp).State = EntityState.Modified;
+                        
+                    }
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(EmployeeIndex));
+                }
+                return View(objNewEmp);
+
             }
             catch (Exception ex)
             {
                 throw ex;
             }
+
         }
 
-        [HttpGet]
-        public JsonResult GetEmployeeDataLoad()
+        public async Task<IActionResult> Delete(int? id)
         {
-            List<EmployeeModel> lstEmployee = new List<EmployeeModel>();
             try
             {
-                lstEmployee = _context.EmployeeModel.OrderByDescending(z => z.EmpId).ToList();
-                var finalRes = (from d in lstEmployee
-                                join dep in _context.DepartmentModel on d.DeptId equals dep.DeptId
-                                select new[] {
-                                    Convert.ToString(d.EmpId),
-                                    Convert.ToString(d.EmpName + ' ' + d.EmpSurname) ,
-                                    Convert.ToString(d.Qualification),
-                                    Convert.ToString(d.ContactNumber),
-                                    Convert.ToString(dep.DeptName)
-                                });
-                return Json(new
+                EmployeeModel objDelEmp = new EmployeeModel();
+                if (id != null)
                 {
-                    aaData = finalRes
-                });
+                    objDelEmp = _context.EmployeeModel.Where(x => x.EmpId == id).FirstOrDefault();
 
-            }
-            catch (Exception ex)
-            {
-                return Json(new
-                {
-                    aaData = new List<string[]> { }
-                });
-
-            }
-        }
-
-        [HttpPost]
-        public JsonResult EditEmployeeDetails(int id)
-        {
-            object editData = new object();
-            try
-            {
-                if (id != 0)
-                {
-                    editData = _context.EmployeeModel.Where(x => x.EmpId == id).FirstOrDefault();
-                    if (editData != null)
+                    if (objDelEmp != null)
                     {
-                        return Json(editData);
-                    }
-                }
-                return Json(editData);
-            }
-            catch (Exception ex)
-            {
-                return Json(new
-                {
-                    aaData = new List<string[]> { }
-                });
-            }
-        }
-
-        [HttpPost]
-        public async Task<JsonResult> DeleteEmployee(int id)
-        {
-            string finalRes = string.Empty;
-            try
-            {
-                if (id != 0)
-                {
-                    var delEmployee = _context.EmployeeModel.Where(x => x.EmpId == id).FirstOrDefault();
-                    if (delEmployee != null)
-                    {
-                        _context.Entry(delEmployee).State = EntityState.Deleted;
+                        _context.Entry(objDelEmp).State = EntityState.Deleted;
                         await _context.SaveChangesAsync();
-                        finalRes = "Deleted";
-                    }
-                    else
-                    {
-                        finalRes = "NotDeleted";
                     }
                 }
-                else
-                {
-
-                    finalRes = "There is somthing wrong!";
-                }
-
-
-                return Json(finalRes);
+                return RedirectToAction(nameof(EmployeeIndex));
             }
             catch (Exception ex)
             {
-                return Json(new
-                {
-                    aaData = new List<string[]> { }
-                });
+                throw ex;
             }
-
         }
 
     }

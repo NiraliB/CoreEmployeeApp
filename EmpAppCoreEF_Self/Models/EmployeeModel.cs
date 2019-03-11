@@ -14,16 +14,27 @@ namespace EmpAppCoreEF_Self.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int EmpId { get; set; }
 
+        [Required]
         public string EmpName { get; set; }
+
+        [Required]
         public string EmpSurname { get; set; }
+
+        [Required]
         public string Qualification { get; set; }
+
+        [Required]
         public string Address { get; set; }
+
+        [Required]
         public string ContactNumber { get; set; }
+
+        [Required]
         public int DeptId { get; set; }
         public DepartmentModel DepartmentModel { get; set; }
 
         [NotMapped]
         public SelectList DepartmentList { get; set; }
-
     }
+    
 }

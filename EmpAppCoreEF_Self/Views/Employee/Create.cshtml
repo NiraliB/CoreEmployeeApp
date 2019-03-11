@@ -1,0 +1,80 @@
+﻿@model EmpAppCoreEF_Self.Models.EmployeeModel
+
+@{
+    ViewData["Title"] = "Employee Entry";
+}
+
+<h3>Employee Entry</h3>
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <form asp-action="Create">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="EmpId" />
+
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label asp-for="EmpName" class="control-label">Employee Name</label>
+                        <input asp-for="EmpName" class="form-control" />
+                        <span asp-validation-for="EmpName" class="text-danger field-validation-valid" ></span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label asp-for="EmpSurname" class="control-label">Surname</label>
+                        <input asp-for="EmpSurname" class="form-control" />
+                        <span asp-validation-for="EmpSurname" class="text-danger field-validation-valid" ></span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label asp-for="Qualification" class="control-label">Qualification</label>
+                        <input asp-for="Qualification" class="form-control" />
+                        <span asp-validation-for="Qualification" class="text-danger field-validation-valid" ></span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label asp-for="Address" class="control-label">Address</label>
+                        <input asp-for="Address" class="form-control" />
+                        <span asp-validation-for="Address" class="text-danger field-validation-valid" ></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label asp-for="ContactNumber" class="control-label">Contact No</label>
+                        <input asp-for="ContactNumber" class="form-control" onkeypress="return isNumber(event);" />
+                        <span asp-validation-for="ContactNumber" class="text-danger field-validation-valid" ></span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label asp-for="DeptId" class="control-label">Department Name</label>
+                        <select asp-for="DeptId" class="form-control" asp-items="ViewBag.DeptList"></select>
+                        <span asp-validation-for="DeptId" class="text-danger field-validation-valid"></span>
+                    </div>
+                </div>
+                <div class="col-md-4" style="margin-top:23px;">
+                    <div class="form-group">
+                        <input type="submit" id="btnSaveEmpData" value="Save" class="btn btn-primary" />
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="row">
+            <div class="col-md-4">
+                <a asp-action="EmployeeIndex">Back to List</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

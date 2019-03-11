@@ -12,6 +12,7 @@ namespace EmpAppCoreEF_Self.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int DeptId { get; set; }
+        [Required]
         public string DeptName { get; set; }
         public bool IsDelete { get; set; }
 

@@ -18,147 +18,85 @@ namespace EmpAppCoreEF_Self.Controllers
             _context = Context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            //return View(await _context.DepartmentModel.ToListAsync());
-            return View();
+            return View(await _context.DepartmentModel.Where(x => x.IsDelete == false).ToListAsync());
+        }
+
+        public async Task<IActionResult> Create(int? id)
+        {
+            DepartmentModel department = new DepartmentModel();
+
+            if (id != null)
+            {
+                department = await _context.DepartmentModel.FindAsync(id);
+
+                if (department == null)
+                {
+                    return NotFound();
+                }
+            }
+
+            return View(department);
         }
 
         [HttpPost]
-        public async Task<JsonResult> SaveData(DepartmentModel objDept)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(DepartmentModel objDeptView)
         {
-            string result = string.Empty;
             try
             {
                 DepartmentModel objNewDept = new DepartmentModel();
-
-                objNewDept.DeptName = objDept.DeptName;
-                objNewDept.IsDelete = false;
-
-                if (objDept.DeptId == 0)
+                if (ModelState.IsValid)
                 {
-                    _context.Entry(objNewDept).State = EntityState.Added;
-                    result = "Saved";
-                }
-                else
-                {
-                    objNewDept.DeptId = objDept.DeptId;
-                    _context.Entry(objNewDept).State = EntityState.Modified;
-                    result = "Updated";
+                    objNewDept.DeptName = objDeptView.DeptName;
+                    objNewDept.IsDelete = false;
 
+                    if (objDeptView.DeptId == 0)
+                    {
+                        _context.Add(objNewDept);
+                    }
+                    else
+                    {
+                        objNewDept.DeptId = objDeptView.DeptId;
+                        _context.Entry(objNewDept).State = EntityState.Modified;
+                    }
+
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
-                await _context.SaveChangesAsync();
-                return Json(result);
+                return View(objNewDept);
+
             }
             catch (Exception ex)
             {
                 throw ex;
             }
-
         }
-
-        [HttpGet]
-        public JsonResult GetDepartmentDataLoad()
+        
+        public async Task<IActionResult> Delete(int? id)
         {
-            List<DepartmentModel> lstDept = new List<DepartmentModel>();
             try
             {
-                lstDept = _context.DepartmentModel.Where(x => x.IsDelete == false).OrderByDescending(z => z.DeptId).ToList();
-                var finalRes = (from d in lstDept
-                                select new[] {
-                                    Convert.ToString(d.DeptId),
-                                    Convert.ToString(d.DeptName)
-                                });
-                return Json(new
+                DepartmentModel objDelDept = new DepartmentModel();
+                if (id != null)
                 {
-                    aaData = finalRes
-                });
+                    objDelDept = _context.DepartmentModel.Where(x => x.DeptId == id).FirstOrDefault();
 
+                    if (objDelDept != null)
+                    {
+                        objDelDept.IsDelete = true;
+                        _context.Entry(objDelDept).State = EntityState.Modified;
+                        await _context.SaveChangesAsync();
+                    }
+                }
+                return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                return Json(new
-                {
-                    aaData = new List<string[]> { }
-                });
-
+                throw ex;
             }
         }
-
-        [HttpPost]
-        public async Task<JsonResult> DeleteDepartment(int id)
-        {
-            string finalRes = string.Empty;
-            try
-            {
-                if (id != 0)
-                {
-                    var delDept = _context.DepartmentModel.Where(x => x.DeptId == id).FirstOrDefault();
-                    if (delDept != null)
-                    {
-                        var ifExistEmp = _context.EmployeeModel.Where(e => e.DeptId == delDept.DeptId).ToList();
-
-                        if (ifExistEmp != null && ifExistEmp.Count > 0)
-                        {
-                            finalRes = "EmployeeIsThere";
-                        }
-                        else
-                        {
-                            delDept.IsDelete = true;
-                            _context.Entry(delDept).State = EntityState.Modified;
-                            await _context.SaveChangesAsync();
-                            finalRes = "Deleted";
-                        }
-                    }
-                    else
-                    {
-                        finalRes = "NotDeleted";
-                    }
-                }
-                else
-                {
-
-                    finalRes = "There is somthing wrong!";
-                }
-
-
-                return Json(finalRes);
-            }
-            catch (Exception ex)
-            {
-                return Json(new
-                {
-                    aaData = new List<string[]> { }
-                });
-            }
-
-        }
-
-        [HttpPost]
-        public JsonResult EditDepartmentData(int id)
-        {
-            object editData = new object();
-            try
-            {
-                if (id != 0)
-                {
-                    editData = _context.DepartmentModel.Where(x => x.DeptId == id).FirstOrDefault();
-                    if (editData != null)
-                    {
-                        return Json(editData);
-                    }
-                }
-                return Json(editData);
-            }
-            catch (Exception ex)
-            {
-                return Json(new
-                {
-                    aaData = new List<string[]> { }
-                });
-            }
-        }
-
 
     }
 }
