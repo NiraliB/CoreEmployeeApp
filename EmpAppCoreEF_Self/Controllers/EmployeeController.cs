@@ -24,7 +24,7 @@ namespace EmpAppCoreEF_Self.Controllers
             var employeeList = _context.EmployeeModel.Include(e => e.DepartmentModel);
             return View(await employeeList.ToListAsync());
         }
-
+         
         public async Task<IActionResult> Create(int? id)
         {
             EmployeeModel employee = new EmployeeModel();
