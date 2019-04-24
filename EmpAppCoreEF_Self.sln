@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.421
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmpAppCoreEF_Self", "EmpAppCoreEF_Self\EmpAppCoreEF_Self.csproj", "{56A79783-702B-479F-A218-43E5EEA29848}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmpAppCoreEF_Self", "EmpAppCoreEF_Self\EmpAppCoreEF_Self.csproj", "{56A79783-702B-479F-A218-43E5EEA29848}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestOnEmp", "UnitTestOnEmp\UnitTestOnEmp.csproj", "{7249220C-5E35-43A2-9528-927748346C27}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{56A79783-702B-479F-A218-43E5EEA29848}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56A79783-702B-479F-A218-43E5EEA29848}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56A79783-702B-479F-A218-43E5EEA29848}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7249220C-5E35-43A2-9528-927748346C27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7249220C-5E35-43A2-9528-927748346C27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7249220C-5E35-43A2-9528-927748346C27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7249220C-5E35-43A2-9528-927748346C27}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

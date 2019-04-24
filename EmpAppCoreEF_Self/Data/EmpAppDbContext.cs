@@ -12,7 +12,7 @@ namespace EmpAppCoreEF_Self.Data
         public EmpAppDbContext(DbContextOptions<EmpAppDbContext> options) : base(options)
         {
         }
-
+        
         public DbSet<DepartmentModel> DepartmentModel { get; set; }
         public DbSet<EmployeeModel> EmployeeModel { get; set; }
     }

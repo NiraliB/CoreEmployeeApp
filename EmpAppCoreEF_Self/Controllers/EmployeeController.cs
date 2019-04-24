@@ -1,5 +1,7 @@
 ﻿using EmpAppCoreEF_Self.Data;
+using EmpAppCoreEF_Self.EmpService;
 using EmpAppCoreEF_Self.Models;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -12,22 +14,25 @@ namespace EmpAppCoreEF_Self.Controllers
 {
     public class EmployeeController : Controller
     {
+        private readonly IEmployee _Iemp;
         private readonly EmpAppDbContext _context;
 
-        public EmployeeController(EmpAppDbContext Context)
+        public EmployeeController(EmpAppDbContext dbCon, IEmployee inEmp)
         {
-            _context = Context;
+            _context = dbCon;
+            _Iemp = inEmp;
         }
 
-        public async Task<IActionResult> EmployeeIndex()
+        public IActionResult EmployeeIndex()
         {
-            var employeeList = _context.EmployeeModel.Include(e => e.DepartmentModel);
-            return View(await employeeList.ToListAsync());
+            var getEmpLst = _Iemp.GetEmployeeList();
+            return View(getEmpLst);
         }
-         
+
         public async Task<IActionResult> Create(int? id)
         {
             EmployeeModel employee = new EmployeeModel();
+
             List<SelectListItem> lstDeptData = (from d in _context.DepartmentModel
                                                 where (d.IsDelete == false)
                                                 select new SelectListItem
@@ -76,7 +81,7 @@ namespace EmpAppCoreEF_Self.Controllers
                     {
                         objNewEmp.EmpId = objEmpView.EmpId;
                         _context.Entry(objNewEmp).State = EntityState.Modified;
-                        
+
                     }
                     await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(EmployeeIndex));

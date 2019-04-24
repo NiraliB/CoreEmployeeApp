@@ -15,7 +15,6 @@ namespace EmpAppCoreEF_Self.Models
         [Required]
         public string DeptName { get; set; }
         public bool IsDelete { get; set; }
-
         public ICollection<EmployeeModel> EmployeeModels { get; set; }
     }
 }
