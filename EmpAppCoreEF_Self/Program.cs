@@ -4,8 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using EmpAppCoreEF_Self.Data;
+using EmpAppCoreEF_Self.Models;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -17,7 +19,6 @@ namespace EmpAppCoreEF_Self
         public static void Main(string[] args)
         {
             var host = CreateWebHostBuilder(args).Build();
-
             using (var scope = host.Services.CreateScope())
             {
                 var service = scope.ServiceProvider;
@@ -37,5 +38,6 @@ namespace EmpAppCoreEF_Self
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
          WebHost.CreateDefaultBuilder(args).UseStartup<Startup>();
+
     }
 }

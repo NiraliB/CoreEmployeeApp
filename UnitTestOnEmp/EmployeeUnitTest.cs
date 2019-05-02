@@ -45,7 +45,6 @@ namespace UnitTestOnEmp
                 {
                     Assert.IsNotType<EmployeeModel>(getEmp);
                 }
-                
             }
         }
 

@@ -1,0 +1,66 @@
+﻿@model EmpAppCoreEF_Self.Models.ViewModels.LoginViewModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Login Page</title>
+    <link href="~/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link href="~/css/common.css" rel="stylesheet" />
+    <link href="~/css/LoginStyle.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="wrapper">
+        <form asp-action="Login" method="post">
+            <div class="form-signin">
+                <h2 class="form-signin-heading">Login</h2>
+                <input asp-for="UserName" type="text" class="form-control" id="UserName" placeholder="Username" />
+                <span asp-validation-for="UserName" class="text-danger field-validation-valid"></span>
+
+                <input asp-for="Password" type="password" class="form-control" id="Password" placeholder="Password" />
+                <span asp-validation-for="Password" class="text-danger field-validation-valid"></span>
+
+                <input class="btn btn-lg btn-primary btn-block" type="submit" id="btnLogin" value="Login" />
+
+                @*<button class="btn btn-lg btn-primary btn-block" type="button" onclick="GetLogin()">Login</button>*@
+                <br />
+                <a asp-controller="Account" asp-action="SignUp" class="btn btn-lg btn-primary btn-block">Sign Up</a>
+
+            </div>
+        </form>
+    </div>
+</body>
+</html>
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+
+@*<script type="text/javascript">
+
+    function GetLogin() {
+      $.ajax({
+          type: "POST",
+          url: '@Url.Action("LoginWithIdentity", "Account")',
+          data: {
+              UserName: $('#UserName').val(),
+              Password: $('#Password').val()
+          },
+          error: function (result) {
+            alert("There is a Problem, Try Again!");
+          },
+          success: function (result) {
+              if (result.status == true) {
+              window.location.href = '@Url.Action("Index", "Home")';
+            }
+            else {
+              alert(result.message);
+            }
+         }
+    });
+  }
+
+</script>*@

@@ -1,5 +1,6 @@
 ﻿using EmpAppCoreEF_Self.Data;
 using EmpAppCoreEF_Self.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace EmpAppCoreEF_Self.Controllers
 {
+    [Authorize(Roles = "Admin, DeptManager")]
     public class DepartmentController : Controller
     {
         private readonly EmpAppDbContext _context;

@@ -8,7 +8,7 @@ namespace EmpAppCoreEF_Self.EmpService
 {
    public  interface IEmployee : IDisposable
     {
-        List<EmployeeModel> GetEmployeeList();
+        Task<List<EmployeeModel>> GetEmployeeList();
         EmployeeModel GetEmpById(int Id);
         bool DeleteEmployee(int delId);
     }

@@ -17,9 +17,9 @@ namespace EmpAppCoreEF_Self.EmpService
           dbContext = newDb;
         }
 
-        public List<EmployeeModel> GetEmployeeList()
+        public async Task<List<EmployeeModel>> GetEmployeeList()
         {
-            return dbContext.EmployeeModel.Include(e => e.DepartmentModel).ToList();
+            return await dbContext.EmployeeModel.Include(e => e.DepartmentModel).ToListAsync();
         }
 
         public EmployeeModel GetEmpById(int empId)

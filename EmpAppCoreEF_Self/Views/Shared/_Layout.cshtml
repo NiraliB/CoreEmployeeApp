@@ -9,13 +9,12 @@
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
         <link rel="stylesheet" href="~/css/site.css" />
         <link rel="stylesheet" href="~/css/dataTables.bootstrap.min.css" />
-        <link href="~/css/Common.css" rel="stylesheet" />
+        <link href="/css/Common.css" rel="stylesheet" />
     </environment>
     <environment exclude="Development">
         <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
               asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
               asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
-
         <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
     </environment>
 </head>
@@ -27,10 +26,19 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Home" asp-action="Index" >Home</a></li>
-                    <li><a asp-area="" asp-controller="Department" asp-action="Index" >Department</a></li>
-                    <li><a asp-area="" asp-controller="Employee" asp-action="EmployeeIndex">Employee</a></li>
+                    <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+                    @if (User.IsInRole("DeptManager") || User.IsInRole("Admin"))
+                    {
+                        <li><a asp-area="" asp-controller="Department" asp-action="Index">Department</a></li>
+                    }
+
+                    @if (User.IsInRole("EmployeeMember") || User.IsInRole("Admin"))
+                    {
+                        <li><a asp-area="" asp-controller="Employee" asp-action="EmployeeIndex">Employee</a></li>
+                    }
+
                 </ul>
+                <partial name="_LoginPartial" />
             </div>
         </div>
     </nav>

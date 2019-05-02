@@ -1,7 +1,7 @@
 ﻿using EmpAppCoreEF_Self.Data;
 using EmpAppCoreEF_Self.EmpService;
 using EmpAppCoreEF_Self.Models;
-
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -12,21 +12,19 @@ using System.Threading.Tasks;
 
 namespace EmpAppCoreEF_Self.Controllers
 {
+    [Authorize(Roles = "Admin, EmployeeMember")]
     public class EmployeeController : Controller
     {
-        private readonly IEmployee _Iemp;
         private readonly EmpAppDbContext _context;
 
-        public EmployeeController(EmpAppDbContext dbCon, IEmployee inEmp)
+        public EmployeeController(EmpAppDbContext dbCon)
         {
             _context = dbCon;
-            _Iemp = inEmp;
         }
 
-        public IActionResult EmployeeIndex()
+        public async Task<IActionResult> EmployeeIndex()
         {
-            var getEmpLst = _Iemp.GetEmployeeList();
-            return View(getEmpLst);
+            return View(await _context.EmployeeModel.Include(e => e.DepartmentModel).ToListAsync());
         }
 
         public async Task<IActionResult> Create(int? id)

@@ -5,9 +5,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using EmpAppCoreEF_Self.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EmpAppCoreEF_Self.Controllers
 {
+    [Authorize(Roles = "Admin, EmployeeMember, DeptManager")]
     public class HomeController : Controller
     {
         public IActionResult Index()
